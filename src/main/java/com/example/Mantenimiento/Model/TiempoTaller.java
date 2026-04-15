@@ -1,0 +1,22 @@
+package com.example.Mantenimiento.Model;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+public class TiempoTaller {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id_tiempoTaller;
+
+    @ManyToOne
+    @JoinColumn(name = "id_zona", nullable = false)
+    private Zona zona;
+
+    private Long minutos_desde_taller;
+}
