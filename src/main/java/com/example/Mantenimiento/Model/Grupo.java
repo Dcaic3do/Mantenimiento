@@ -1,6 +1,7 @@
 package com.example.Mantenimiento.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +16,8 @@ import java.util.List;
 public class Grupo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id_grupo;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Long id_grupo;
 
     private String nombre;
     //private String turno_tipo;

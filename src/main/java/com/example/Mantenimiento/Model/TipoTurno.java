@@ -1,10 +1,12 @@
 package com.example.Mantenimiento.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -13,14 +15,16 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@Data
 public class TipoTurno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id_tipoTurno;
 
     private String tipo;
-    private Time hora_inicio;
-    private Time hora_fin;
+    private LocalTime horaInicio;
+    private LocalTime horaFin;
 
     @OneToMany(mappedBy = "tipo_turno", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
