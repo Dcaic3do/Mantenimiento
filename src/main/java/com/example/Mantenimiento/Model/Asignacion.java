@@ -17,7 +17,6 @@ import java.util.Date;
 public class Asignacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id_asignacion;
 
     @ManyToOne

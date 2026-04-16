@@ -16,7 +16,6 @@ import java.util.List;
 public class Zona {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private long id_zona;
 
     private String nombre;

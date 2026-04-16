@@ -13,7 +13,6 @@ import lombok.*;
 public class TiempoTaller {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id_tiempoTaller;
 
     @ManyToOne

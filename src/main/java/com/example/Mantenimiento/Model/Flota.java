@@ -16,7 +16,6 @@ import java.util.List;
 public class Flota {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id_flota;
 
     private String nombre;

@@ -16,7 +16,6 @@ import java.util.List;
 public class Tarea {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id_tarea;
 
     private String nombre;

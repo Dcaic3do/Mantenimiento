@@ -19,7 +19,6 @@ import java.util.List;
 public class TipoTurno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id_tipoTurno;
 
     private String tipo;
