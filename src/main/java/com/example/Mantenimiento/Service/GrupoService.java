@@ -55,7 +55,7 @@ public class GrupoService {
     }
     public Grupo actualizar(Long id_grupo, Grupo grupo) {
         if (!grupoRepository.existsById(id_grupo)) {
-            throw new IllegalArgumentException("No se encontró un tipo de turno con el ID " + id_grupo);
+            throw new IllegalArgumentException("No se encontró un grupo con el ID " + id_grupo);
         }
         return grupoRepository.save(grupo);
     }
