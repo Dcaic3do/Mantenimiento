@@ -24,11 +24,11 @@ public class Zona {
     @JsonIgnore
     private List<TiempoTaller> tiempoTalleres;
 
-    @OneToMany(mappedBy = "zona_origen", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "zonaOrigen", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<TiempoTraslado> trasladosOrigen;
 
-    @OneToMany(mappedBy = "zona_destino", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "zonaDestino", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<TiempoTraslado> trasladosDestino;
 

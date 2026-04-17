@@ -16,12 +16,12 @@ public class TiempoTraslado {
     private Long id_tiempoTraslado;
 
     @ManyToOne
-    @JoinColumn(name = "id_zona_origen", nullable = false)
-    private Zona zona_origen;
+    @JoinColumn(name = "idZonaOrigen", nullable = false)
+    private Zona zonaOrigen;
 
     @ManyToOne
-    @JoinColumn(name = "id_zona_destino", nullable = false)
-    private Zona zona_destino;
+    @JoinColumn(name = "idZonaDestino", nullable = false)
+    private Zona zonaDestino;
 
     private int minutos;
 }
