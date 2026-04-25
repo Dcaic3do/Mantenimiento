@@ -1,11 +1,14 @@
 package com.example.Mantenimiento.Model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 @Entity
@@ -39,8 +42,10 @@ public class Asignacion {
     @JsonIgnore
     private Turno turno;
 
-    private Time hora_inicio_programada;
-    private Time hora_fin_programada;
+    private LocalTime hora_inicio_programada;
+    private LocalTime hora_fin_programada;
     private float tiempoTrasladoMin;
     private String estado;
+    @Column(name = "fecha_programada")
+    private LocalDate fechaProgramada;
 }

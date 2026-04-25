@@ -1,9 +1,12 @@
 package com.example.Mantenimiento.Service;
 
-import com.example.Mantenimiento.Model.Flota;
+import com.example.Mantenimiento.DTO.SolicitudInspeccionDTO;
+import com.example.Mantenimiento.Mapper.SolicitudInspeccionMapper;
 import com.example.Mantenimiento.Model.SolicitudInspeccion;
+import com.example.Mantenimiento.Repository.AsignacionRepository;
 import com.example.Mantenimiento.Repository.SolicitudInsRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,9 +14,11 @@ import java.util.Optional;
 @Service
 public class SolicitudInspeccionService {
     private final SolicitudInsRepository solicitudInsRepository;
+    private final AsignacionRepository asignacionRepository;
 
-    public SolicitudInspeccionService(SolicitudInsRepository solicitudInsRepository) {
+    public SolicitudInspeccionService(SolicitudInsRepository solicitudInsRepository, AsignacionRepository asignacionRepository) {
         this.solicitudInsRepository = solicitudInsRepository;
+        this.asignacionRepository = asignacionRepository;
     }
 
     public SolicitudInspeccion guardar(SolicitudInspeccion solicitudInspeccion) {
@@ -24,12 +29,11 @@ public class SolicitudInspeccionService {
         }
     }
 
-    public List<SolicitudInspeccion> listar(){
-        try {
-            return solicitudInsRepository.findAll();
-        } catch (Exception e) {
-            throw new RuntimeException("Error al listar las solicitudes de inspección " + e.getMessage(), e);
-        }
+    public List<SolicitudInspeccionDTO> listar() {
+        return solicitudInsRepository.findAll()
+                .stream()
+                .map(SolicitudInspeccionMapper::toDTO)
+                .toList();
     }
 
     public void eliminar(Long id_solicitudInspeccion) {
@@ -43,21 +47,36 @@ public class SolicitudInspeccionService {
         }
     }
 
-    public Optional<SolicitudInspeccion> listarPorId(long id_solicitudInspeccion) {
-        try {
-            Optional<SolicitudInspeccion> solicitudInspeccion = solicitudInsRepository.findById(id_solicitudInspeccion);
-            if (solicitudInspeccion.isEmpty()) {
-                throw new IllegalArgumentException("Solicitud de inspección con ID " + id_solicitudInspeccion + " no encontrado.");
-            }
-            return solicitudInspeccion;
-        } catch (Exception e) {
-            throw new RuntimeException("Error al buscar la solicitud de inspección con ID " + id_solicitudInspeccion + e.getMessage(), e);
-        }
+    public SolicitudInspeccionDTO listarPorId(long id) {
+        return solicitudInsRepository.findById(id)
+                .map(SolicitudInspeccionMapper::toDTO)
+                .orElseThrow(() ->
+                        new RuntimeException("Solicitud no encontrada")
+                );
     }
-    public SolicitudInspeccion actualizar(Long id_solicitudInspeccion, SolicitudInspeccion solicitudInspeccion) {
-        if (!solicitudInsRepository.existsById(id_solicitudInspeccion)) {
-            throw new IllegalArgumentException("No se encontró una solicitud de inspección con el ID " + id_solicitudInspeccion);
-        }
-        return solicitudInsRepository.save(solicitudInspeccion);
+
+    public SolicitudInspeccionDTO actualizar(Long id, String estado) {
+
+        SolicitudInspeccion solicitud = solicitudInsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No existe"));
+
+        solicitud.setEstado(estado);
+
+        return SolicitudInspeccionMapper.toDTO(
+                solicitudInsRepository.save(solicitud)
+        );
+    }
+
+    @Transactional
+    public void actualizarEstado(Long id, String estado) {
+        SolicitudInspeccion solicitud = solicitudInsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No encontrada"));
+
+        solicitud.setEstado(estado);
+        solicitudInsRepository.save(solicitud);
+
+        solicitud.setEstado(estado);
+        solicitudInsRepository.save(solicitud);
+        asignacionRepository.eliminarAsignacionesNoActivas();
     }
 }

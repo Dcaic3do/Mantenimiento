@@ -1,11 +1,14 @@
 package com.example.Mantenimiento.Service;
 
+import com.example.Mantenimiento.DTO.AsignacionDTO;
+import com.example.Mantenimiento.Mapper.AsignacionMapper;
 import com.example.Mantenimiento.Model.Asignacion;
 import com.example.Mantenimiento.Repository.AsignacionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AsignacionService {
@@ -23,9 +26,12 @@ public class AsignacionService {
         }
     }
 
-    public List<Asignacion> listar(){
+    public List<AsignacionDTO> listar() {
         try {
-            return asignacionRepository.findAll();
+            return asignacionRepository.findAll()
+                    .stream()
+                    .map(AsignacionMapper::toDTO)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("Error al listar las asignaciones " + e.getMessage(), e);
         }
@@ -42,21 +48,26 @@ public class AsignacionService {
         }
     }
 
-    public Optional<Asignacion> listarPorId(long id_asigancion) {
+    public AsignacionDTO listarPorId(long id_asignacion) {
         try {
-            Optional<Asignacion> asignacion = asignacionRepository.findById(id_asigancion);
-            if (asignacion.isEmpty()) {
-                throw new IllegalArgumentException("Asignación con ID " + id_asigancion + " no encontrada.");
-            }
-            return asignacion;
+            Asignacion asignacion = asignacionRepository.findById(id_asignacion)
+                    .orElseThrow(() ->
+                            new IllegalArgumentException("Asignación con ID " + id_asignacion + " no encontrada.")
+                    );
+
+            return AsignacionMapper.toDTO(asignacion);
+
         } catch (Exception e) {
-            throw new RuntimeException("Error al buscar la asignación con ID " + id_asigancion + e.getMessage(), e);
+            throw new RuntimeException("Error al buscar la asignación con ID " + id_asignacion + e.getMessage(), e);
         }
     }
     public Asignacion actualizar(Long id_asignacion, Asignacion asignacion) {
+
         if (!asignacionRepository.existsById(id_asignacion)) {
             throw new IllegalArgumentException("No se encontró una asignación con el ID " + id_asignacion);
         }
+
+        asignacion.setId_asignacion(id_asignacion);
         return asignacionRepository.save(asignacion);
     }
 }

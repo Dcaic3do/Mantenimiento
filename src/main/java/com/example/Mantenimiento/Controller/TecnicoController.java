@@ -1,8 +1,7 @@
 package com.example.Mantenimiento.Controller;
 
-import com.example.Mantenimiento.Model.Flota;
+import com.example.Mantenimiento.DTO.TecnicoDTO;
 import com.example.Mantenimiento.Model.Tecnico;
-import com.example.Mantenimiento.Repository.TecnicoRepository;
 import com.example.Mantenimiento.Service.TecnicoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,29 +11,26 @@ import java.util.List;
 @RestController
 @RequestMapping("/tecnico")
 public class TecnicoController {
-    private final TecnicoService tecnicoService;
-    private final TecnicoRepository tecnicoRepository;
 
-    public TecnicoController(TecnicoService tecnicoService, TecnicoRepository tecnicoRepository) {
+    private final TecnicoService tecnicoService;
+
+    public TecnicoController(TecnicoService tecnicoService) {
         this.tecnicoService = tecnicoService;
-        this.tecnicoRepository = tecnicoRepository;
     }
 
     @PostMapping("/guardar")
-    public ResponseEntity<Tecnico> guardar(@RequestBody Tecnico tecnico) {
+    public ResponseEntity<TecnicoDTO> guardar(@RequestBody Tecnico tecnico) {
         return ResponseEntity.ok(tecnicoService.guardar(tecnico));
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<Tecnico>> listar() {
+    public ResponseEntity<List<TecnicoDTO>> listar() {
         return ResponseEntity.ok(tecnicoService.listar());
     }
 
     @GetMapping("/listar/{id_tecnico}")
-    public ResponseEntity<Tecnico> obtenerPorId(@PathVariable long id_tecnico) {
-        return tecnicoService.listarPorId(id_tecnico)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<TecnicoDTO> obtenerPorId(@PathVariable long id_tecnico) {
+        return ResponseEntity.ok(tecnicoService.listarPorId(id_tecnico));
     }
 
     @DeleteMapping("/eliminar/{id_tecnico}")
@@ -44,9 +40,10 @@ public class TecnicoController {
     }
 
     @PutMapping("/actualizar/{id_tecnico}")
-    public ResponseEntity<Tecnico> actualizar(@PathVariable Long id_tecnico, @RequestBody Tecnico tecnico) {
-        tecnico.setId_tecnico(id_tecnico);
-        Tecnico tecnicoActualizado = tecnicoService.actualizar(id_tecnico, tecnico);
-        return ResponseEntity.ok(tecnicoActualizado);
+    public ResponseEntity<TecnicoDTO> actualizar(
+            @PathVariable Long id_tecnico,
+            @RequestBody Tecnico tecnico
+    ) {
+        return ResponseEntity.ok(tecnicoService.actualizar(id_tecnico, tecnico));
     }
 }

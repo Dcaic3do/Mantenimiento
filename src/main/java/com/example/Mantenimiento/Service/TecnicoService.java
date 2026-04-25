@@ -1,6 +1,7 @@
 package com.example.Mantenimiento.Service;
 
-import com.example.Mantenimiento.Model.Flota;
+import com.example.Mantenimiento.DTO.TecnicoDTO;
+import com.example.Mantenimiento.Mapper.TecnicoMapper;
 import com.example.Mantenimiento.Model.Tecnico;
 import com.example.Mantenimiento.Repository.TecnicoRepository;
 import org.springframework.stereotype.Service;
@@ -10,25 +11,30 @@ import java.util.Optional;
 
 @Service
 public class TecnicoService {
+
     private final TecnicoRepository tecnicoRepository;
 
     public TecnicoService(TecnicoRepository tecnicoRepository) {
         this.tecnicoRepository = tecnicoRepository;
     }
 
-    public Tecnico guardar(Tecnico tecnico) {
+    public TecnicoDTO guardar(Tecnico tecnico) {
         try {
-            return tecnicoRepository.save(tecnico);
+            Tecnico saved = tecnicoRepository.save(tecnico);
+            return TecnicoMapper.toDTO(saved);
         } catch (Exception e) {
-            throw new RuntimeException("Error al guardar el técnico " + e.getMessage(), e);
+            throw new RuntimeException("Error al guardar el técnico: " + e.getMessage(), e);
         }
     }
 
-    public List<Tecnico> listar(){
+    public List<TecnicoDTO> listar() {
         try {
-            return tecnicoRepository.findAll();
+            return tecnicoRepository.findAll()
+                    .stream()
+                    .map(TecnicoMapper::toDTO)
+                    .toList();
         } catch (Exception e) {
-            throw new RuntimeException("Error al listar los técnicos " + e.getMessage(), e);
+            throw new RuntimeException("Error al listar los técnicos: " + e.getMessage(), e);
         }
     }
 
@@ -39,25 +45,37 @@ public class TecnicoService {
             }
             tecnicoRepository.deleteById(id_tecnico);
         } catch (Exception e) {
-            throw new RuntimeException("Error al eliminar el técnico " + e.getMessage(), e);
+            throw new RuntimeException("Error al eliminar el técnico: " + e.getMessage(), e);
         }
     }
 
-    public Optional<Tecnico> listarPorId(long id_tecnico) {
+    public TecnicoDTO listarPorId(long id_tecnico) {
         try {
-            Optional<Tecnico> tecnico = tecnicoRepository.findById(id_tecnico);
-            if (tecnico.isEmpty()) {
-                throw new IllegalArgumentException("Técnico con ID " + id_tecnico + " no encontrado.");
-            }
-            return tecnico;
+            Tecnico tecnico = tecnicoRepository.findById(id_tecnico)
+                    .orElseThrow(() ->
+                            new IllegalArgumentException("Técnico con ID " + id_tecnico + " no encontrado.")
+                    );
+
+            return TecnicoMapper.toDTO(tecnico);
+
         } catch (Exception e) {
-            throw new RuntimeException("Error al buscar el técnico con ID " + id_tecnico + e.getMessage(), e);
+            throw new RuntimeException("Error al buscar el técnico con ID " + id_tecnico + ": " + e.getMessage(), e);
         }
     }
-    public Tecnico actualizar(Long id_tecnico, Tecnico tecnico) {
-        if (!tecnicoRepository.existsById(id_tecnico)) {
-            throw new IllegalArgumentException("No se encontró un técnico con el ID " + id_tecnico);
+
+    public TecnicoDTO actualizar(Long id_tecnico, Tecnico tecnico) {
+        try {
+            if (!tecnicoRepository.existsById(id_tecnico)) {
+                throw new IllegalArgumentException("No se encontró un técnico con el ID " + id_tecnico);
+            }
+
+            tecnico.setId_tecnico(id_tecnico);
+            Tecnico updated = tecnicoRepository.save(tecnico);
+
+            return TecnicoMapper.toDTO(updated);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al actualizar el técnico: " + e.getMessage(), e);
         }
-        return tecnicoRepository.save(tecnico);
     }
 }

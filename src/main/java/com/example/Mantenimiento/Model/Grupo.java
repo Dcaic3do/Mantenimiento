@@ -19,7 +19,6 @@ public class Grupo {
     private Long id_grupo;
 
     private String nombre;
-    //private String turno_tipo;
 
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore

@@ -1,39 +1,67 @@
 package com.example.Mantenimiento.Controller;
 
+import com.example.Mantenimiento.DTO.EstadoRequestDTO;
+import com.example.Mantenimiento.DTO.SolicitudInspeccionDTO;
 import com.example.Mantenimiento.Model.SolicitudInspeccion;
-import com.example.Mantenimiento.Repository.SolicitudInsRepository;
+import com.example.Mantenimiento.Repository.*;
+import com.example.Mantenimiento.Service.EquipoService;
 import com.example.Mantenimiento.Service.SolicitudInspeccionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/solicitudInspecion")
+@RequestMapping("/solicitudInspeccion")
+@CrossOrigin(originPatterns = "*", allowCredentials = "true")
 public class SolicitudInsController {
     private final SolicitudInspeccionService solicitudInspeccionService;
     private final SolicitudInsRepository solicitudInsRepository;
+    private final EquipoRepository equipoRepository;
+    private final FlotaRepository flotaRepository;
+    private final TareaRepository tareaRepository;
+    private final TecnicaRepository tecnicaRepository;
+    private final ZonaRepository zonaRepository;
 
-    public SolicitudInsController(SolicitudInspeccionService solicitudInspeccionService, SolicitudInsRepository solicitudInsRepository) {
+
+    public SolicitudInsController(SolicitudInspeccionService solicitudInspeccionService, SolicitudInsRepository solicitudInsRepository, EquipoService equipoService, EquipoRepository equipoRepository, FlotaRepository flotaRepository, TareaRepository tareaRepository, TecnicaRepository tecnicaRepository, ZonaRepository zonaRepository) {
         this.solicitudInspeccionService = solicitudInspeccionService;
         this.solicitudInsRepository = solicitudInsRepository;
+        this.equipoRepository = equipoRepository;
+        this.flotaRepository = flotaRepository;
+        this.tareaRepository = tareaRepository;
+        this.tecnicaRepository = tecnicaRepository;
+        this.zonaRepository = zonaRepository;
     }
 
     @PostMapping("/guardar")
-    public ResponseEntity<SolicitudInspeccion> guardar(@RequestBody SolicitudInspeccion solicitudInspeccion) {
-        return ResponseEntity.ok(solicitudInspeccionService.guardar(solicitudInspeccion));
+    public ResponseEntity<?> guardar(@RequestBody SolicitudInspeccionDTO dto) {
+
+        SolicitudInspeccion s = new SolicitudInspeccion();
+
+        s.setOt(dto.getOt());
+        s.setEstado(dto.getEstado());
+        s.setDuracionEstimadaHrs(dto.getDuracionEstimadaHrs());
+        s.setFechaSolicitada(dto.getFechaSolicitada());
+
+        s.setEquipo(equipoRepository.findById(dto.getIdEquipo()).orElseThrow());
+        s.setFlota(flotaRepository.findById(dto.getIdFlota()).orElseThrow());
+        s.setTarea(tareaRepository.findById(dto.getIdTarea()).orElseThrow());
+        s.setTecnica(tecnicaRepository.findById(dto.getIdTecnica()).orElseThrow());
+        s.setZona(zonaRepository.findById(dto.getIdZona()).orElseThrow());
+
+        return ResponseEntity.ok(solicitudInspeccionService.guardar(s));
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<SolicitudInspeccion>> listar() {
+    public ResponseEntity<List<SolicitudInspeccionDTO>> listar() {
         return ResponseEntity.ok(solicitudInspeccionService.listar());
     }
 
     @GetMapping("/listar/{id_solicitudInspeccion}")
-    public ResponseEntity<SolicitudInspeccion> obtenerPorId(@PathVariable long id_solicitudInspeccion) {
-        return solicitudInspeccionService.listarPorId(id_solicitudInspeccion)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<SolicitudInspeccionDTO> obtenerPorId(@PathVariable long id_solicitudInspeccion) {
+        return ResponseEntity.ok(solicitudInspeccionService.listarPorId(id_solicitudInspeccion));
     }
 
     @DeleteMapping("/eliminar/{id_solicitudInspeccion}")
@@ -43,9 +71,11 @@ public class SolicitudInsController {
     }
 
     @PutMapping("/actualizar/{id_solicitudInspeccion}")
-    public ResponseEntity<SolicitudInspeccion> actualizar(@PathVariable Long id_solicitudInspeccion, @RequestBody SolicitudInspeccion solicitudInspeccion) {
-        solicitudInspeccion.setId_solicitudInspeccion(id_solicitudInspeccion);
-        SolicitudInspeccion solicitudInspeccionActualizado = solicitudInspeccionService.actualizar(id_solicitudInspeccion, solicitudInspeccion);
-        return ResponseEntity.ok(solicitudInspeccionActualizado);
+    public ResponseEntity<?> actualizarEstado(
+            @PathVariable Long id_solicitudInspeccion,
+            @RequestBody EstadoRequestDTO request
+    ) {
+        solicitudInspeccionService.actualizarEstado(id_solicitudInspeccion, request.getEstado());
+        return ResponseEntity.ok().build();
     }
 }

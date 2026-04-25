@@ -1,7 +1,11 @@
 package com.example.Mantenimiento.Service;
 
+import com.example.Mantenimiento.DTO.EquipoDTO;
+import com.example.Mantenimiento.Mapper.EquipoMapper;
 import com.example.Mantenimiento.Model.Equipo;
+import com.example.Mantenimiento.Model.Flota;
 import com.example.Mantenimiento.Repository.EquipoRepository;
+import com.example.Mantenimiento.Repository.FlotaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,54 +13,82 @@ import java.util.Optional;
 
 @Service
 public class EquipoService {
-    private final EquipoRepository equipoRepository;
 
-    public EquipoService(EquipoRepository equipoRepository) {
+    private final EquipoRepository equipoRepository;
+    private final FlotaRepository flotaRepository;
+
+    public EquipoService(EquipoRepository equipoRepository, FlotaRepository flotaRepository) {
         this.equipoRepository = equipoRepository;
+        this.flotaRepository = flotaRepository;
     }
 
-    public Equipo guardar(Equipo equipo) {
+    // 🔥 GUARDAR CON DTO
+    public EquipoDTO guardar(EquipoDTO dto) {
         try {
-            return equipoRepository.save(equipo);
+            Flota flota = flotaRepository.findById(dto.getIdFlota())
+                    .orElseThrow(() -> new RuntimeException("Flota no encontrada"));
+
+            Equipo equipo = EquipoMapper.toEntity(dto, flota);
+
+            return EquipoMapper.toDTO(equipoRepository.save(equipo));
+
         } catch (Exception e) {
             throw new RuntimeException("Error al guardar el equipo " + e.getMessage(), e);
         }
     }
 
-    public List<Equipo> listar(){
+    // 🔥 LISTAR COMO DTO
+    public List<EquipoDTO> listar() {
         try {
-            return equipoRepository.findAll();
+            return equipoRepository.findAll()
+                    .stream()
+                    .map(EquipoMapper::toDTO)
+                    .toList();
+
         } catch (Exception e) {
-            throw new RuntimeException("Error al listar los Equipos " + e.getMessage(), e);
+            throw new RuntimeException("Error al listar los equipos " + e.getMessage(), e);
         }
     }
 
-    public void eliminar(Long id_equipo) {
+    // 🔥 ELIMINAR
+    public void eliminar(Long idEquipo) {
         try {
-            if (!equipoRepository.existsById(id_equipo)) {
-                throw new IllegalArgumentException("No se encontró un equipo con el ID " + id_equipo);
+            if (!equipoRepository.existsById(idEquipo)) {
+                throw new IllegalArgumentException("No se encontró un equipo con ID " + idEquipo);
             }
-            equipoRepository.deleteById(id_equipo);
+            equipoRepository.deleteById(idEquipo);
+
         } catch (Exception e) {
             throw new RuntimeException("Error al eliminar el equipo " + e.getMessage(), e);
         }
     }
 
-    public Optional<Equipo> listarPorId(long id_equipo) {
+    // 🔥 LISTAR POR ID
+    public EquipoDTO listarPorId(Long idEquipo) {
         try {
-            Optional<Equipo> equipo = equipoRepository.findById(id_equipo);
-            if (equipo.isEmpty()) {
-                throw new IllegalArgumentException("Equipo con ID " + id_equipo + " no encontrado.");
-            }
-            return equipo;
+            Equipo equipo = equipoRepository.findById(idEquipo)
+                    .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
+
+            return EquipoMapper.toDTO(equipo);
+
         } catch (Exception e) {
-            throw new RuntimeException("Error al buscar el equipo con ID " + id_equipo + e.getMessage(), e);
+            throw new RuntimeException("Error al buscar el equipo " + e.getMessage(), e);
         }
     }
-    public Equipo actualizar(Long id_equipo, Equipo equipo) {
-        if (!equipoRepository.existsById(id_equipo)) {
-            throw new IllegalArgumentException("No se encontró un equipo con el ID " + id_equipo);
+
+    // 🔥 ACTUALIZAR
+    public EquipoDTO actualizar(Long idEquipo, EquipoDTO dto) {
+
+        if (!equipoRepository.existsById(idEquipo)) {
+            throw new IllegalArgumentException("No se encontró un equipo con el ID " + idEquipo);
         }
-        return equipoRepository.save(equipo);
+
+        Flota flota = flotaRepository.findById(dto.getIdFlota())
+                .orElseThrow(() -> new RuntimeException("Flota no encontrada"));
+
+        Equipo equipo = EquipoMapper.toEntity(dto, flota);
+        equipo.setId_equipo(idEquipo);
+
+        return EquipoMapper.toDTO(equipoRepository.save(equipo));
     }
 }

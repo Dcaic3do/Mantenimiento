@@ -1,5 +1,6 @@
 package com.example.Mantenimiento.Controller;
 
+import com.example.Mantenimiento.DTO.AsignacionDTO;
 import com.example.Mantenimiento.Model.Asignacion;
 import com.example.Mantenimiento.Repository.AsignacionRepository;
 import com.example.Mantenimiento.Service.AsignacionService;
@@ -25,15 +26,13 @@ public class AsignacionController {
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<Asignacion>> listar() {
+    public ResponseEntity<List<AsignacionDTO>> listar() {
         return ResponseEntity.ok(asignacionService.listar());
     }
 
     @GetMapping("/listar/{id_asignacion}")
-    public ResponseEntity<Asignacion> obtenerPorId(@PathVariable long id_asignacion) {
-        return asignacionService.listarPorId(id_asignacion)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<AsignacionDTO> obtenerPorId(@PathVariable long id_asignacion) {
+        return ResponseEntity.ok(asignacionService.listarPorId(id_asignacion));
     }
 
     @DeleteMapping("/eliminar/{id_asignacion}")
@@ -43,9 +42,11 @@ public class AsignacionController {
     }
 
     @PutMapping("/actualizar/{id_asignacion}")
-    public ResponseEntity<Asignacion> actualizar(@PathVariable Long id_asignacion, @RequestBody Asignacion asignacion) {
+    public ResponseEntity<Asignacion> actualizar(
+            @PathVariable Long id_asignacion,
+            @RequestBody Asignacion asignacion) {
+
         asignacion.setId_asignacion(id_asignacion);
-        Asignacion asignacionActualizado = asignacionService.actualizar(id_asignacion, asignacion);
-        return ResponseEntity.ok(asignacionActualizado);
+        return ResponseEntity.ok(asignacionService.actualizar(id_asignacion, asignacion));
     }
 }

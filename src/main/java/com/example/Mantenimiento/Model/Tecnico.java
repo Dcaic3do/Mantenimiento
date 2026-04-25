@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Entity
@@ -37,4 +39,24 @@ public class Tecnico {
     @OneToMany(mappedBy = "tecnico_acompanante", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Asignacion> tecnicoAcompanante;
+
+    // En Tecnico.java
+
+    /**
+     * Une las listas de asignaciones donde el técnico es líder y donde es acompañante.
+     * Esto es vital para calcular su ubicación actual y su carga horaria total.
+     */
+    public List<Asignacion> getTodasMisAsignaciones() {
+        List<Asignacion> todas = new ArrayList<>();
+
+        if (this.tecnicoLider != null) {
+            todas.addAll(this.tecnicoLider);
+        }
+
+        if (this.tecnicoAcompanante != null) {
+            todas.addAll(this.tecnicoAcompanante);
+        }
+
+        return todas;
+    }
 }

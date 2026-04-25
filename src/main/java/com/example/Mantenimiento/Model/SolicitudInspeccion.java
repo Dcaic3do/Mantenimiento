@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -23,31 +24,26 @@ public class SolicitudInspeccion {
 
     @ManyToOne
     @JoinColumn(name = "id_equipo", nullable = false)
-    @JsonIgnore
     private Equipo equipo;
 
     @ManyToOne
     @JoinColumn(name = "id_flota", nullable = false)
-    @JsonIgnore
     private Flota flota;
 
     @ManyToOne
     @JoinColumn(name = "id_tarea", nullable = false)
-    @JsonIgnore
     private Tarea tarea;
 
     @ManyToOne
     @JoinColumn(name = "id_tecnica", nullable = false)
-    @JsonIgnore
     private Tecnica tecnica;
 
     @ManyToOne
     @JoinColumn(name = "id_zona", nullable = false)
-    @JsonIgnore
     private Zona zona;
 
     private float duracionEstimadaHrs;
-    private Date fechaSolicitada;
+    private LocalDateTime fechaSolicitada;
     private String estado;
 
     @OneToMany(mappedBy = "solicitud", cascade = CascadeType.ALL, orphanRemoval = true)
